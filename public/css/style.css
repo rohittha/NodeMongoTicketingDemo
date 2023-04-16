@@ -26,7 +26,8 @@ body {
 .page-content {
 }
 main {
-  text-align: center;
+  text-align: left;
+  margin: 30px;
 }
 footer {
   bottom: 0;
@@ -42,9 +43,12 @@ footer div {
 header > div {
   height: 115px;
   display: flex;
-  color: #5e5b5b;
+  /* color: #5e5b5b;
+  background-color: #e0e0e0; */
+  color: white;
+  background-color: black;
+
   vertical-align: middle;
-  background-color: #e0e0e0;
   justify-content: left;
 }
 header img {
@@ -116,4 +120,28 @@ input[type="submit"] {
 .submit {
   padding-left: 160px;
   text-align: left;
+}
+main table {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 5px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+th {
+  background-color: #ccc;
+  font-weight: bold;
+}
+table tr:nth-child(odd) {
+  background-color: whitesmoke;
+  padding: 5px;
+}
+table tr:nth-child(even) {
+  background-color: white;
+  padding: 5px;
 }

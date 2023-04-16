@@ -1,8 +1,28 @@
 <%- include('shared/header.ejs') -%>
     <%- include('admin/adminnav.ejs') -%>
         <main>
-
-            <h1>Admin's Secret Home Page</h1>
+            <h1>Admin Dashboard</h1>
+            <h2>Tickets</h2>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                </tr>
+                <!-- Use a forEach to display records -->
+                <% ticketsData.forEach(ticket=> { %>
+                    <tr>
+                        <td>
+                            <%= ticket.name %>
+                        </td>
+                        <td>
+                            <%= ticket.email %>
+                        </td>
+                        <!-- Add a link to view a single records will match our route that we define in index.js -->
+                        <td><a href="<%= `/details/${ticket.name}` %>">View</a></td>
+                    </tr>
+                    <% }); %>
+            </table>
 
         </main>
 

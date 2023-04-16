@@ -27,7 +27,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/ticketingDB", {
   useUnifiedTopology: true,
 });
 
-const tickets = mongoose.model("tickets", {
+const Ticket = mongoose.model("tickets", {
   name: String,
   email: String,
   description: String,
@@ -84,7 +84,7 @@ myApp.post(
         imageName: imageName,
       };
 
-      let myCard = new tickets(pageData);
+      let myCard = new Ticket(pageData);
       myCard.save();
       // send the data to the view and render it
       res.render("thankyou", pageData);
@@ -122,10 +122,13 @@ myApp.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-// Get Admin dashboard
+// Get Admin dashboard and pass list of tickets
 myApp.get("/admin-home", (req, res) => {
   if (req.session.loggedIn) {
-    res.render("admin-dashboard");
+    const ticketData = Ticket.find();
+    console.log("ticketsData", ticketData);
+    res.render("admin-dashboard", { ticketData });
+    // res.render("home", { data });
   } else {
     res.redirect("/login");
   }
@@ -146,7 +149,9 @@ myApp.post("/adminLogin", async (req, res) => {
     req.session.userId = administrator.userId;
     req.session.loggedIn = true;
     console.log("In adminLogin - userId found :", userId);
-    res.render("admin-dashboard");
+    const ticketsData = await Ticket.find();
+    console.log("ticketsData", ticketsData);
+    res.render("admin-dashboard", { ticketsData });
   } else {
     let loginData = {
       error: "User ID and password combination not found!",
