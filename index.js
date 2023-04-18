@@ -35,48 +35,48 @@ const Ticket = mongoose.model("tickets", {
 });
 
 myApp.get("/", (req, res) => {
-  res.render("home");
-  console.log("In Home !");
+  let userType = "guest";
+  if (req.session.loggedIn) {
+    userType = "admin";
+  }
+  res.render("createTicket", { userType });
+});
+
+myApp.get("/createTicket/:userType", (req, res) => {
+  let userType = req.params.userType;
+  res.render("createTicket", { userType });
+  console.log("In createTicket !");
 });
 
 var nameRegex = /^[a-zA-Z0-9]$/;
 
 myApp.post(
-  "/process",
+  "/createTicket",
   [
     check("desc", "Description required").not().isEmpty(),
     check("email", "Email should be valid").isEmail(),
   ],
   function (req, res) {
-    // check for errors
     const errors = validationResult(req);
     console.log(errors);
     if (!errors.isEmpty()) {
-      res.render("home", { er: errors.array() });
+      res.render("createTicket", { er: errors.array() });
     } else {
-      //fetch all the form fields
-      var name = req.body.name; // the key here is from the name attribute not the id attribute
+      var name = req.body.name;
       var email = req.body.email;
       var description = req.body.desc;
 
       console.log("name : ", name);
       console.log("email : ", email);
 
-      // fetch the file
-      // get the name of the file
       var imageName = req.files.image.name;
-      // get the actual file
-      var imageFile = req.files.image; // this is a temporary file in buffer.
+      var imageFile = req.files.image;
 
-      // save the file
-      // check if the file already exists or employ some logic that each filename is unique.
       var imagePath = "public/uploads/" + imageName;
-      // move the temp file to a permanent location mentioned above
       imageFile.mv(imagePath, function (err) {
         console.log(err);
       });
 
-      // create an object with the fetched data to send to the view
       var pageData = {
         name: name,
         email: email,
@@ -86,7 +86,6 @@ myApp.post(
 
       let myCard = new Ticket(pageData);
       myCard.save();
-      // send the data to the view and render it
       res.render("thankyou", pageData);
     }
   }
@@ -123,12 +122,11 @@ myApp.get("/logout", (req, res) => {
 });
 
 // Get Admin dashboard and pass list of tickets
-myApp.get("/admin-home", (req, res) => {
+myApp.get("/admin-home", async (req, res) => {
   if (req.session.loggedIn) {
-    const ticketData = Ticket.find();
-    console.log("ticketsData", ticketData);
-    res.render("admin-dashboard", { ticketData });
-    // res.render("home", { data });
+    const ticketsData = await Ticket.find();
+    console.log("ticketsData", ticketsData);
+    res.render("admin-dashboard", { ticketsData });
   } else {
     res.redirect("/login");
   }
@@ -158,6 +156,76 @@ myApp.post("/adminLogin", async (req, res) => {
     };
     res.render("login", loginData);
   }
+});
+
+// Get record data from database and fill the controls with this data
+myApp.get("/openTicket/:id/:viewType", async (req, res) => {
+  let ticketId = req.params.id;
+  let viewType = req.params.viewType;
+  console.log("in openTicket viewType : ", viewType);
+  const ticket = await Ticket.findOne({ _id: ticketId }).exec();
+  if (viewType == "view" || viewType == "delete") {
+    res.render("viewticket", { viewType, ticket });
+  } else if (viewType == "edit") {
+    res.render("edit", { ticket });
+  }
+});
+
+myApp.post(
+  "/editTicket",
+  [
+    check("desc", "Description required").not().isEmpty(),
+    check("email", "Email should be valid").isEmail(),
+  ],
+  async function (req, res) {
+    const errors = validationResult(req);
+    console.log(errors);
+    if (!errors.isEmpty()) {
+      res.render("createTicket", { er: errors.array() });
+    } else {
+      var ticketId = req.body.id;
+      var name = req.body.name;
+      var email = req.body.email;
+      var description = req.body.desc;
+      var imageName = req.files.image.name;
+      var imageFile = req.files.image;
+
+      var imagePath = "public/uploads/" + imageName;
+      imageFile.mv(imagePath, function (err) {
+        console.log(err);
+      });
+
+      var pageData = {
+        ticketId: ticketId,
+        name: name,
+        email: email,
+        description: description,
+        imageName: imageName,
+      };
+      console.log("In editTicket - pageData", pageData);
+      var updatedRecord = await Ticket.updateOne(
+        { _id: ticketId },
+        { name, email, description, imageName },
+        { new: true }
+      ).exec();
+
+      console.log("Ticket updated : ", updatedRecord);
+      // let myCard = new Ticket(pageData);
+      // myCard.save();
+
+      let message_header = "Thank You!";
+      let message_body = "A new request has been successfully created!";
+      res.render("displayMessage", { message_header, message_body });
+    }
+  }
+);
+
+myApp.post("/deleteTicket", async (req, res) => {
+  let id = req.body.id;
+  await Ticket.findByIdAndRemove({ _id: id }).exec();
+  let message_header = "Thank You!";
+  let message_body = "The record has been successfully deleted!";
+  res.render("displayMessage", { message_header, message_body });
 });
 
 myApp.listen(8083);

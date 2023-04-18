@@ -1,0 +1,42 @@
+<%- include('shared/header.ejs') -%>
+    <% if(userType=='admin' ) { %>
+        <%- include('admin/adminnav.ejs') -%>
+            <% } else if(userType=='guest' ) { %>
+                <%- include('shared/nav.ejs') -%>
+                    <% } %>
+                        <main>
+
+                            <h1>Generate New Ticket</h1>
+                            <form action="/createTicket" method="post" enctype="multipart/form-data">
+                                <div class="form-field">
+                                    <label for="Name">Name</label>
+                                    <input type="text" id="Name" name="name">
+                                    <p class="error">
+
+                                    </p>
+                                </div>
+                                <div class="form-field">
+                                    <label for="Email">Email</label>
+                                    <input type="text" id="Email" name="email">
+                                    <p class="error">
+
+                                    </p>
+                                </div>
+                                <div class="form-field">
+                                    <label for="Image">Image</label>
+                                    <input type="file" id="Image" name="image">
+                                </div>
+                                <div class="form-field">
+                                    <label for="desc">Description</label>
+                                    <input type="text" id="desc" name="desc">
+                                    <p class="error">
+                                    </p>
+                                </div>
+                                <div class="submit">
+                                    <input type="submit" value="Generate Ticket">
+                                </div>
+                            </form>
+
+                        </main>
+
+                        <%- include('shared/footer.ejs') -%>

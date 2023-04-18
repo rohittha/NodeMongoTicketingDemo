@@ -5,21 +5,28 @@
             <h2>Tickets</h2>
             <table>
                 <tr>
+                    <th>Id</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Subject</th>
+                    <th>Actions</th>
                 </tr>
                 <!-- Use a forEach to display records -->
                 <% ticketsData.forEach(ticket=> { %>
                     <tr>
+                        <td>
+                            <%= ticket.id %>
+                        </td>
                         <td>
                             <%= ticket.name %>
                         </td>
                         <td>
                             <%= ticket.email %>
                         </td>
-                        <!-- Add a link to view a single records will match our route that we define in index.js -->
-                        <td><a href="<%= `/details/${ticket.name}` %>">View</a></td>
+                        <!-- Call endpoint which will get ticketID and type of view to open -->
+                        <td><a href="<%= `/openTicket/${ticket.id}/view` %>">View</a>
+                            <a href="<%= `/openTicket/${ticket.id}/edit` %>">Edit</a>
+                            <a href="<%= `/openTicket/${ticket.id}/delete` %>">Delete</a>
+                        </td>
                     </tr>
                     <% }); %>
             </table>
